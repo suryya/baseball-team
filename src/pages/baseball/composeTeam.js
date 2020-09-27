@@ -26,42 +26,8 @@ export default function ComposeQuarter() {
         return (matched && matched.length)
     },[members])
 
-    // const validateMembertName = useCallback((value,allValues,fieldName) => {
-    //     let regex = /^[A-Za-z\s]+$/
-    //     let error;
-    //     if (!value) {
-    //       error = `${fieldName} is required`;
-    //     } else if (!regex.test(value)) {
-    //       error = `${fieldName} should be Alphabets only`;
-    //     }else if(checkUniqueMember(allValues)){
-    //         error = "Member with same First and Last name exists";
-    //     }
-    //     return error;
-    // },[checkUniqueMember])
-    
 
-    // function validateHeight(value) {
-    //     let error;
-    //     if (!value) {
-    //       error = "Height is required";
-    //     } else if (isNaN(Number(value))) {
-    //       error = "Height must be number";
-    //     }else if (!isNaN(Number(value)) && Number(value) <= 0) {
-    //         error = "Height must be positive number";
-    //     }
-    //     return error;
-    // }
-    // function validatePosition(value) {
-    //     let error;
-    //     if (!value) {
-    //       error = "Position is required";
-    //     } else if (!positionOptions.includes(value)) {
-    //       error = "Position must be one of the dropdown options";
-    //     }
-    //     return error;
-    // }
-
-      const validationSchema = React.useMemo(() => Yup.object({
+    const validationSchema = React.useMemo(() => Yup.object({
         fname: Yup
           .string()
           .label('First name')
@@ -92,15 +58,13 @@ export default function ComposeQuarter() {
           .string()
           .label('Position')
           .required()
-      }),[checkUniqueMember]);
+    }),[checkUniqueMember]);
 
       
 
     const onSubmitMemberAdd = useCallback((values, actions) => {
         
-        //setTimeout(() => {
             dispatch({type:ADD_MEMBER,payload:values})
-            //let matched = checkUniqueMember(values)
             actions.resetForm({formInitValues})
             actions.setStatus({success: true})    
             toast({
@@ -112,7 +76,6 @@ export default function ComposeQuarter() {
                 isClosable: true,
               })
             actions.setSubmitting(false);
-        //}, 500);
 
     }, [dispatch,toast,formInitValues]);
 
@@ -124,7 +87,9 @@ export default function ComposeQuarter() {
                 <Flex size="65%" align="center" justify="center">
 
                     <Box w="100%" h="10">
-
+                        <Heading as="h4" size="md" p={4} >
+                            Enter team member details
+                        </Heading>
                         <Formik
                                 initialValues={formInitValues}
                                 onSubmit={onSubmitMemberAdd}
@@ -132,7 +97,6 @@ export default function ComposeQuarter() {
                                 
                                 {props => (
                                     <Form>
-                                        {/* validate={(value) => validateMembertName(value,props.values,'First Name') } */}
                                         <Box w="100%" p={4} >
 
                                         <SimpleGrid columns={1} spacing={10}>
@@ -144,9 +108,6 @@ export default function ComposeQuarter() {
                                                                 <Input  {...field} type="text" id="f-name" aria-describedby="Enter first name"  
                                                                         placeholder="First Name"/>
                                                                 <ErrorMessage id="first-name-helper-text" component={TextError} name="fname" />
-                                                                {/* <FormErrorMessage id="email-helper-text">
-                                                                    {form.touched.fname && form.errors.fname}
-                                                                </FormErrorMessage> */}
                                                             </FormControl>
 
                                                         )}
@@ -155,7 +116,6 @@ export default function ComposeQuarter() {
 
 
                                             <Box height="40px">
-                                                {/* validate={(value) => validateMembertName(value,props.values,'Last Name') } */}
                                                 <Field name="lname">
                                                 {({ field, form }) => (
 
@@ -215,7 +175,7 @@ export default function ComposeQuarter() {
 
                                         </SimpleGrid>
 
-                                    </Box>
+                                        </Box>
 
                                                 
                                     </Form>

@@ -83,7 +83,6 @@ function baseballReducer(state, {type,payload}) {
 }
 
 function BaseballProvider({children}) {
-  //const initData = useMemo(() => ({members: [],team:[],positionOptions}),[]) 
   const initData =  useRef({members: [],team:[],positionOptions})
   const [state, dispatch] = React.useReducer(baseballReducer,initData.current)
 
@@ -109,13 +108,13 @@ function BaseballProvider({children}) {
             newState =  {...state}
           }
           newState = {...state,...{members: [...state.members,...[action.payload]]}}
-           writeMiddleware(saveStateToLocalStorate)(newState).then((resolve)=>{
+           writeMiddleware(saveStateToLocalStorate)(newState).then(()=>{
             dispatch({type:action.type,payload:newState})
            })
           break;
         case CREATE_TEAM:
            newState = {...state,...{team:action.payload}}
-           writeMiddleware(saveStateToLocalStorate)(newState).then(function(resolve){
+           writeMiddleware(saveStateToLocalStorate)(newState).then(()=>{
               dispatch({type:action.type,payload:newState})
            })
           break;

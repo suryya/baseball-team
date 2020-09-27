@@ -1,5 +1,5 @@
 import React, { useEffect, useState , useCallback } from 'react';
-import {Box, FormControl, Select , ButtonGroup, Button, SimpleGrid ,useToast } from "@chakra-ui/core";
+import {Box, FormControl, Select , ButtonGroup, Button, SimpleGrid ,useToast, Heading, Flex } from "@chakra-ui/core";
 import {useTeamState, useTeamDispatch} from './teamContext';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import TextError from '../../components/TextError'
@@ -37,9 +37,7 @@ export default function ComposeTeam() {
     const onSubmitCreateTeam = useCallback((values, actions) => {
 
         let payload = values.position.reduce((acc,crr,i) => ({...acc,...{[crr]:values.users[i]}}) ,{});
-
         dispatch({type:CREATE_TEAM,payload})
-        //actions.resetForm({formInitValues})
         actions.setStatus({success: true})    
         toast({
             title: "Success",
@@ -88,68 +86,80 @@ export default function ComposeTeam() {
     },[members]);
 
     return (
-      <Box w="70%" p={4}>
-                <Formik onSubmit={onSubmitCreateTeam} 
-                        initialValues={formInitValues} 
-                        enableReinitialize>
-                    {props => (
-                        <Form>
-                            <SimpleGrid columns={2} spacingX="40px" spacingY="20px">
-                                {positionOptions?.length && positionOptions.map((pos,i) => {
-                                    return (
-                                     <React.Fragment key={pos}>
-                                        <Box height="80px">
-                                            
-                                            <Field name={`users[${i}]`} validate={(value) => validatTeamMembers(value,props.values,i)}>
-                                                {({ field, form }) => (
-                                                        <FormControl  isInvalid={form.errors?.users?.[i] && form.touched?.users?.[i]}>
-                                                        <Select  {...field} placeholder="Choose Member">
-                                                            {users?.length && users.map(o => {
-                                                                return <option key={o} value={o}>{o}</option>
-                                                            })}
-                                                        </Select>
-                                                        <ErrorMessage component={TextError}name={`users[${i}]`} />
-                                                        
-                                                        </FormControl>
-                                                )}
-                                            </Field>
+        <Flex align="center">
+
+            <Box w="70%"  h="10">
+
+                        <Heading as="h4" size="md"  p={4} >
+                            Compose bsae ball team
+                        </Heading>
+                        <Formik onSubmit={onSubmitCreateTeam} 
+                                initialValues={formInitValues} 
+                                enableReinitialize>
+                            {props => (
+                                <Form >
+                                    <Box w="100%" p={4} >
+                                    <SimpleGrid  columns={2} spacingX="40px"  spacingY="20px">
+                                        {positionOptions?.length && positionOptions.map((pos,i) => {
+                                            return (
+                                            <React.Fragment key={pos}>
+                                                <Box height="80px">
+                                                    
+                                                    <Field name={`users[${i}]`} validate={(value) => validatTeamMembers(value,props.values,i)}>
+                                                        {({ field, form }) => (
+                                                                <FormControl  isInvalid={form.errors?.users?.[i] && form.touched?.users?.[i]}>
+                                                                <Select  {...field} placeholder="Choose Member">
+                                                                    {users?.length && users.map(o => {
+                                                                        return <option key={o} value={o}>{o}</option>
+                                                                    })}
+                                                                </Select>
+                                                                <ErrorMessage component={TextError}name={`users[${i}]`} />
+                                                                
+                                                                </FormControl>
+                                                        )}
+                                                    </Field>
+                                                </Box>
+
+                                                <Box height="80px">
+                                                    <Field  name={`position[${i}]`} validate={(value) => validatePosition(value,props.values,i)}>
+                                                        {({ field, form }) => (
+                                                                <FormControl   isInvalid={form.errors?.position?.[i] && form.touched?.position?.[i]}>
+                                                                <Select  {...field} placeholder="Choose Position">
+                                                                    {positionOptions?.length && positionOptions.map(o => {
+                                                                        return <option key={o} value={o}>{o}</option>
+                                                                    })}
+                                                                </Select>
+                                                                <ErrorMessage component={TextError}name={`position[${i}]`} />
+                                                                
+                                                                </FormControl>
+                                                        )}
+                                                    </Field>
+                                                </Box>
+                                            </React.Fragment>
+                                        )})}
+
+                                        <Box height="70px">
+                                            <FormControl >
+                                                <ButtonGroup spacing={4}>
+                                                    <Button variantColor="gray" size="md" type="reset" onClick={() => props.resetForm(formInitValues)}>
+                                                        Reset
+                                                    </Button>
+                                                    <Button variantColor="blue" size="md" isLoading={props.isSubmitting} type="submit">
+                                                        Save
+                                                    </Button>
+                                                </ButtonGroup>
+                                            </FormControl>
                                         </Box>
 
-                                        <Box height="80px">
-                                            <Field  name={`position[${i}]`} validate={(value) => validatePosition(value,props.values,i)}>
-                                                {({ field, form }) => (
-                                                        <FormControl   isInvalid={form.errors?.position?.[i] && form.touched?.position?.[i]}>
-                                                        <Select  {...field} placeholder="Choose Position">
-                                                            {positionOptions?.length && positionOptions.map(o => {
-                                                                return <option key={o} value={o}>{o}</option>
-                                                            })}
-                                                        </Select>
-                                                        <ErrorMessage component={TextError}name={`position[${i}]`} />
-                                                        
-                                                        </FormControl>
-                                                )}
-                                            </Field>
-                                        </Box>
-                                     </React.Fragment>
-                                )})}
+                                    </SimpleGrid>
+                                    </Box>
 
-                                <Box height="70px">
-                                    <FormControl >
-                                        <ButtonGroup spacing={4}>
-                                            <Button variantColor="gray" size="md" type="reset" onClick={() => props.resetForm(formInitValues)}>
-                                                Reset
-                                            </Button>
-                                            <Button variantColor="blue" size="md" isLoading={props.isSubmitting} type="submit">
-                                                Save
-                                            </Button>
-                                        </ButtonGroup>
-                                    </FormControl>
-                                </Box>
+                                </Form>
+                            )}
+                        </Formik>
+            </Box>
 
-                            </SimpleGrid>
-                        </Form>
-                    )}
-                </Formik>
-      </Box>
+        </Flex>
+
     );
   }
