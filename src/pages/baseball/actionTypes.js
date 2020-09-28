@@ -1,0 +1,6 @@
+export default {
+  CREATE_TEAM: 'CREATE_TEAM',
+  ADD_MEMBER: 'ADD_MEMBER',
+  DATA_READY: 'DATA_READY',
+  };
+  
