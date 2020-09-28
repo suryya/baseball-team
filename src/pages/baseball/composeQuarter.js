@@ -1,3 +1,8 @@
+/*
+* The first quarter form renders the prevously selected values for members
+* and respective spositions if they were saved previously
+* It  first quarter form was not saved previously it renders empty form
+*/
 import React, { useEffect, useState , useCallback } from 'react';
 import {Box, FormControl, Select , ButtonGroup, Button, SimpleGrid ,useToast, Heading, Flex } from "@chakra-ui/core";
 import {useTeamState, useTeamDispatch} from './teamContext';
@@ -70,9 +75,11 @@ export default function ComposeTeam() {
         } else if (repeatedUsers && allValues.users[idx] === value) {
           error = "Team member can't be repeated";
         }else if(allValues.position[idx] && allValues.users[idx] === value){
+            let memberPosition;
             error = members.filter((member) => {
+                memberPosition = `${member.fname} ${member.lname}` === value ?  member.position : memberPosition;
                 return `${member.fname} ${member.lname}` === value && member.position === allValues.position[idx]
-            })?.length === 0  ? 'Selcted user does not match the position' : undefined;  
+            })?.length === 0  ? `Member's position is "${memberPosition}" , it doesn't match the selected one` : undefined;
         }        
 
         return error;
@@ -89,7 +96,7 @@ export default function ComposeTeam() {
         }else if(allValues.users[idx] && allValues.position[idx] === value){
             error = members.filter((member) => {
                 return `${member.position}` === value && `${member.fname} ${member.lname}` === allValues.users[idx]
-            })?.length === 0  ? 'Selcted position does not match the user' : undefined;      
+            })?.length === 0  ? `Selcted position does not match that of the selected member's` : undefined;
         }
         return error;
     },[members]);
