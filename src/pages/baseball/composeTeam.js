@@ -1,4 +1,4 @@
-import React,  {useCallback} from 'react';
+import React,  {useCallback,useRef} from 'react';
 
 import { Box, FormControl, Input, 
          Select , ButtonGroup, Button, SimpleGrid ,
@@ -12,21 +12,29 @@ import ACTIONS from './actionTypes';
 const {ADD_MEMBER} = ACTIONS;
 
 export default function ComposeQuarter() {
+    
+    //context updater handle
     const dispatch = useTeamDispatch()
+
+    //Data fetched from context store
     const {members,positionOptions} = useTeamState()
     const toast = useToast();
+    
+    //Initialize object to represent the form structure 
+    const formInitValues =  useRef({  fname:'' , 
+                                lname:'' , 
+                                height:'', 
+                                position:'' });
 
-    let formInitValues = { fname:'' , 
-                           lname:'' , 
-                           height:'', 
-                           position:'' }
-
+    //check the first and last name of the team member against the 
+    //previously entered team members to ensure no duplicate names are entered
     const checkUniqueMember = useCallback((values) => {
-        let matched = members.filter((mem) => `${mem.fname}${mem.lname}` === `${values.fname}${values.lname}`);
-        return (matched && matched.length)
+        let matched = members.filter((mem) => (`${mem.fname}${mem.lname}`).toLowerCase() 
+                                                === (`${values.fname}${values.lname}`).toLowerCase());
+        return (matched && matched.length) ? false : true;
     },[members])
 
-
+    //Yup form validation schema
     const validationSchema = React.useMemo(() => Yup.object({
         fname: Yup
           .string()
@@ -36,7 +44,7 @@ export default function ComposeQuarter() {
             return (/^[A-Za-z\s]+$/.test(value))
           })
           .test('unique-name', 'Name should be unique', function(value) {
-            return !checkUniqueMember({fname:value,lname:this.parent.lname})
+            return checkUniqueMember({fname:value,lname:this.parent.lname})
           }),
         lname: Yup
           .string()
@@ -46,7 +54,7 @@ export default function ComposeQuarter() {
             return (/^[A-Za-z\s]+$/.test(value))
           })
           .test('unique-name', 'Name should be unique', function(value) {
-            return !checkUniqueMember({lname:value,fname:this.parent.fname})
+            return checkUniqueMember({lname:value,fname:this.parent.fname})
           }),
         height: Yup
           .number()
@@ -60,12 +68,12 @@ export default function ComposeQuarter() {
           .required()
     }),[checkUniqueMember]);
 
-      
 
+    //Form submit handler for adding new member to the list 
     const onSubmitMemberAdd = useCallback((values, actions) => {
         
             dispatch({type:ADD_MEMBER,payload:values})
-            actions.resetForm({formInitValues})
+            actions.resetForm(formInitValues.current)
             actions.setStatus({success: true})    
             toast({
                 title: "Success",
@@ -82,7 +90,6 @@ export default function ComposeQuarter() {
 
     return (
 
-
             <Flex align="center">
                 <Flex size="65%" align="center" justify="center">
 
@@ -91,7 +98,7 @@ export default function ComposeQuarter() {
                             Enter team member details
                         </Heading>
                         <Formik
-                                initialValues={formInitValues}
+                                initialValues={formInitValues.current}
                                 onSubmit={onSubmitMemberAdd}
                                 validationSchema={validationSchema}>
                                 
@@ -163,7 +170,7 @@ export default function ComposeQuarter() {
                                             <Box height="70px">
                                                 <FormControl >
                                                     <ButtonGroup spacing={4}>
-                                                        <Button variantColor="gray" size="md" type="reset" onClick={() => props.resetForm(formInitValues)}>
+                                                        <Button variantColor="gray" size="md" type="reset" onClick={() => props.resetForm(formInitValues.current)}>
                                                             Reset
                                                         </Button>
                                                         <Button variantColor="blue" size="md" isLoading={props.isSubmitting} type="submit">
@@ -187,6 +194,7 @@ export default function ComposeQuarter() {
 
                 </Flex>
 
+               {/*This section is to display the list of members already added to the list*/}
                 <Flex size="35%" align="center" justify="center">
 
                     <Box w="100%" h="10" p={8} > 

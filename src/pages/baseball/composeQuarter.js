@@ -8,12 +8,19 @@ const {CREATE_TEAM} = ACTIONS;
 
 export default function ComposeTeam() {
 
+    //context updater handle
     const dispatch = useTeamDispatch()
+
+    //Data fetched from context store
     const {members,team,positionOptions} = useTeamState()
+
     const [users,setUsers] = useState([]);
     const toast = useToast();
     const [formInitValues,setFormInitValues] = useState({});
     
+
+    //updates the form data container with the values from context store
+    // based on positionOptions and team
     const restoreSavedValues = useCallback((team,positionOptions) => {
             
             let initValues = {users:positionOptions.map((p) => team?.[p] ?? ''), 
@@ -21,6 +28,7 @@ export default function ComposeTeam() {
             setFormInitValues(initValues)        
     },[])
 
+    //forms the list of team members which will be shown as dropdown options
     useEffect(
         () => {
           let memberNames = members?.length && members.map(member => `${member.fname} ${member.lname}`);
@@ -28,12 +36,14 @@ export default function ComposeTeam() {
         },
     [members]);
 
+    //trigger restoreSavedValues when dependencies change
     useEffect(
         () => {
             restoreSavedValues(team,positionOptions)
         },
     [team,positionOptions,restoreSavedValues]);
 
+    //Form submit handler , creates the JSON to be stored in context store and calls dispatch
     const onSubmitCreateTeam = useCallback((values, actions) => {
 
         let payload = values.position.reduce((acc,crr,i) => ({...acc,...{[crr]:values.users[i]}}) ,{});
@@ -51,9 +61,8 @@ export default function ComposeTeam() {
 
       }, [dispatch,toast]);
 
-
+    //Validate slected team member as per the constraints
     const validatTeamMembers = useCallback((value,allValues,idx) => {
-        console.log('validatTeamMembers:',allValues)
         let repeatedUsers = allValues.users.filter((user) => user && user === value).length > 1 ? true : false;
         let error;
         if (!value) {
@@ -69,8 +78,8 @@ export default function ComposeTeam() {
         return error;
     },[members]);
 
+    //Validate slected position as per the constraints
     const validatePosition = useCallback((value,allValues,idx) => {
-        console.log('validatePosition:',allValues)
         let repeatedPosition = allValues.position.filter((pos) => pos && pos === value).length > 1 ? true : false;
         let error;
         if (!value) {
