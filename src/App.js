@@ -1,5 +1,5 @@
 import React from 'react';
-import {BaseBallTeam} from './pages'
+import {BaseBallTeam} from './pages/baseball'
 import { Helmet } from "react-helmet";
 import AppTheme from './theme';
 

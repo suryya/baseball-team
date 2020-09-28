@@ -3,10 +3,10 @@ import { Tabs, TabList, TabPanels, Tab, TabPanel, Box } from "@chakra-ui/core";
 import ComposeQuarter from './composeQuarter';
 import ComposeTeam from './composeTeam';
 import {BaseballProvider} from './teamContext';
+import WithErrorHandler from '../../utils/ErrorBoundary'
 
 
-
-export default function BaseBallTeam() {
+export function BaseBallTeam() {
     const [tabIndex, setTabIndex] = React.useState(0);
   
   
@@ -38,3 +38,5 @@ export default function BaseBallTeam() {
       </Box>
     );
   }
+
+  export default WithErrorHandler(BaseBallTeam) 

@@ -3,6 +3,7 @@
 // like an async API so that same pattern can be followed 
 // when local storeage is replaced by API calls or any other 
 // async storage
+const LOCAL_STORE_KEY = 'baseball-team';
 export const asyncLocalStorage = {
     setItem: function (key, value) {
         return Promise.resolve().then(function () {
@@ -18,7 +19,7 @@ export const asyncLocalStorage = {
   
   // Read from local storage in an async operation
   export async function readFromStore(initState){
-    let savedState = await asyncLocalStorage.getItem('baseball-team')
+    let savedState = await asyncLocalStorage.getItem(LOCAL_STORE_KEY)
     if(savedState){
       savedState = JSON.parse(savedState)
     }
@@ -32,7 +33,7 @@ export const asyncLocalStorage = {
   
   // write to local storage in an async operation
   export async function saveStateToLocalStorate(state){
-    await asyncLocalStorage.setItem('baseball-team',JSON.stringify(state))
+    await asyncLocalStorage.setItem(LOCAL_STORE_KEY,JSON.stringify(state))
   }
   
   //HOC for writing to localstorage    

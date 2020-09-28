@@ -11,7 +11,7 @@
 
 import React , {useEffect, useCallback, useRef} from 'react'
 import {readFromStore, saveStateToLocalStorate, 
-        writeMiddleware, readMiddleware} from '../../utils'
+        writeMiddleware, readMiddleware} from '../../utils/localStoreUtils'
 import ACTIONS from './actionTypes';
 const {CREATE_TEAM, ADD_MEMBER, DATA_READY} = ACTIONS;
 
@@ -93,13 +93,13 @@ function BaseballProvider({children}) {
           newState = {...state,...{members: [...state.members,...[action.payload]]}}
            writeMiddleware(saveStateToLocalStorate)(newState).then(()=>{
             dispatch({type:action.type,payload:newState})
-           })
+           },(e)=>console.log('Failed writing to store'))
           break;
         case CREATE_TEAM:
            newState = {...state,...{team:action.payload}}
            writeMiddleware(saveStateToLocalStorate)(newState).then(()=>{
               dispatch({type:action.type,payload:newState})
-           })
+           },(e)=>console.log('Failed reading from store'))
           break;
         default:
           throw new Error(`Unhandled action type: ${action.type}`)
