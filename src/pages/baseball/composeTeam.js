@@ -14,8 +14,9 @@ const {ADD_MEMBER} = ACTIONS;
 
 const CustomSelect = ({ label, ...props }) => {
 
-    const [field, helpers] = useField(props);
+    const [field, meta, helpers] = useField(props);
     const { options } = props;
+    const { touched, error, value } = meta;
     const { setValue } = helpers;  
     const {isMulti, placeholder} = props;
 
@@ -50,7 +51,7 @@ export default function ComposeQuarter() {
                                 lname:'' , 
                                 height:'', 
                                 position: [] });
-
+                                
     //check the first and last name of the team member against the 
     //previously entered team members to ensure no duplicate names are entered
     const checkUniqueMember = useCallback((values) => {
@@ -109,9 +110,10 @@ export default function ComposeQuarter() {
 
     //Form submit handler for adding new member to the list 
     const onSubmitMemberAdd = useCallback((values, actions) => {
-
+                
             let formattedValues = {...values,
                                    ...{position:values.position.map((v) => v.value)}}
+            //debugger
             dispatch({type:ADD_MEMBER,payload:formattedValues})
             actions.resetForm(formInitValues.current)
             actions.setStatus({success: true})    
@@ -195,7 +197,7 @@ export default function ComposeQuarter() {
                                                 <Field name="position">
                                                 {({ field, form }) => (
                                                         <FormControl   isInvalid={form.errors.position && form.touched.position}>
-                                                        <CustomSelect name="position" isMulti {...field} placeholder="Choose Position" options={dropDownOptions}/>
+                                                        <CustomSelect name="position" isMulti {...field} placeholder="Choose Position" options={dropDownOptions}/>                                                            
                                                         <ErrorMessage id="email-helper-text" component={TextError} name="position" />
                                                         </FormControl>
                                                 )}
