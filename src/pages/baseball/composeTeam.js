@@ -20,15 +20,29 @@ const CustomSelect = ({ label, ...props }) => {
     const { setValue } = helpers;  
     const {isMulti, placeholder} = props;
 
+
+    const customStyles = React.useMemo(() => {
+        return {
+            control: (base, state) => ({
+              ...base,
+              borderRadius: (state.isFocused || error) ? "4px 4px 4px 4px" : 3,
+              borderColor: (error ? "#e53e3e" :"#ccddee"),
+              borderWidth: (error ? "2px" :"1px")
+            })
+          }
+    },[error])
+
+
     return (
       <>
        <Select
+        styles={customStyles} 
         isMulti={isMulti}
         placeholder={placeholder}
         options={options}
         value={field.value}
         name={field.name}
-        onChange={(option) => setValue(option)}
+        onChange={(option) => setValue(option ?? [])}
         instanceId={props.iid}
       />
       </>
