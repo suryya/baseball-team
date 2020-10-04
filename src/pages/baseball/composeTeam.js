@@ -14,7 +14,7 @@ const {ADD_MEMBER} = ACTIONS;
 
 const CustomSelect = ({ label, ...props }) => {
 
-    const [field, meta, helpers] = useField(props);
+    const [field, helpers] = useField(props);
     const { options } = props;
     const { setValue } = helpers;  
     const {isMulti, placeholder} = props;
