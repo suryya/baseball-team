@@ -1,15 +1,40 @@
 import React,  {useCallback,useRef} from 'react';
 
 import { Box, FormControl, Input, 
-         Select , ButtonGroup, Button, SimpleGrid ,
+         ButtonGroup, Button, SimpleGrid ,
          useToast , List , ListItem  , Flex, Heading} from "@chakra-ui/core";
-import { Formik, Form, Field, ErrorMessage } from 'formik';
+import { Formik, Form, Field, ErrorMessage, useField } from 'formik';
 import {useTeamState, useTeamDispatch} from './teamContext';
 import TextError from '../../components/TextError'
+import Select from 'react-select';
 import * as Yup from 'yup'
 import ACTIONS from './actionTypes';
 
 const {ADD_MEMBER} = ACTIONS;
+
+const CustomSelect = ({ label, ...props }) => {
+
+    const [field, meta, helpers] = useField(props);
+    const { options } = props;
+    const { setValue } = helpers;  
+    const {isMulti, placeholder} = props;
+
+    return (
+      <>
+       <Select
+        isMulti={isMulti}
+        placeholder={placeholder}
+        options={options}
+        value={field.value}
+        name={field.name}
+        onChange={(option) => setValue(option)}
+        instanceId={props.iid}
+      />
+      </>
+    );
+  };
+  
+
 
 export default function ComposeQuarter() {
     
@@ -24,7 +49,7 @@ export default function ComposeQuarter() {
     const formInitValues =  useRef({  fname:'' , 
                                 lname:'' , 
                                 height:'', 
-                                position:'' });
+                                position: [] });
 
     //check the first and last name of the team member against the 
     //previously entered team members to ensure no duplicate names are entered
@@ -63,16 +88,31 @@ export default function ComposeQuarter() {
           .required()
           .positive('should be a positive number'),
         position: Yup
-          .string()
+           .array()
+           .min(1, 'Choose at least one position')
+           .of(
+                Yup.object().shape({
+                    value: Yup.string().required(),
+                    label: Yup.string().required(),
+                })
+            )
           .label('Position')
-          .required()
     }),[checkUniqueMember]);
+
+
+    const dropDownOptions = React.useMemo(() => {
+        return positionOptions.map((val) => { 
+            return {value: val, label: val}
+        });
+    },[positionOptions])
 
 
     //Form submit handler for adding new member to the list 
     const onSubmitMemberAdd = useCallback((values, actions) => {
-        
-            dispatch({type:ADD_MEMBER,payload:values})
+
+            let formattedValues = {...values,
+                                   ...{position:values.position.map((v) => v.value)}}
+            dispatch({type:ADD_MEMBER,payload:formattedValues})
             actions.resetForm(formInitValues.current)
             actions.setStatus({success: true})    
             toast({
@@ -155,11 +195,7 @@ export default function ComposeQuarter() {
                                                 <Field name="position">
                                                 {({ field, form }) => (
                                                         <FormControl   isInvalid={form.errors.position && form.touched.position}>
-                                                        <Select  {...field} placeholder="Choose Position">
-                                                            {positionOptions?.length && positionOptions.map(o => {
-                                                                return <option key={o} value={o}>{o}</option>
-                                                            })}
-                                                        </Select>
+                                                        <CustomSelect name="position" isMulti {...field} placeholder="Choose Position" options={dropDownOptions}/>
                                                         <ErrorMessage id="email-helper-text" component={TextError} name="position" />
                                                         </FormControl>
                                                 )}

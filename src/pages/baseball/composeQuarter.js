@@ -56,7 +56,7 @@ export default function ComposeTeam() {
         actions.setStatus({success: true})    
         toast({
             title: "Success",
-            description: "Team successfully created",
+            description: "Successfully created",
             status: "success",
             duration: 2000,
             position: "top-right",
@@ -76,10 +76,19 @@ export default function ComposeTeam() {
           error = "Team member can't be repeated";
         }else if(allValues.position[idx] && allValues.users[idx] === value){
             let memberPosition;
+            let memberPositionError;
             error = members.filter((member) => {
-                memberPosition = `${member.fname} ${member.lname}` === value ?  member.position : memberPosition;
-                return `${member.fname} ${member.lname}` === value && member.position === allValues.position[idx]
-            })?.length === 0  ? `Member's position is "${memberPosition}" , it doesn't match the selected one` : undefined;
+                memberPosition = `${member.fname} ${member.lname}` === value 
+                                    ? (Array.isArray(member.position) ? (member.position).join(',') : member.position)
+                                    : memberPosition;
+                memberPositionError = `${member.fname} ${member.lname}` === value ?
+                                     ((Array.isArray(member.position) && member.position.length > 1) ?
+                                      `Member's  positions are "${memberPosition}" , the selected one doesn't match them`: 
+                                      `Member's  position is "${memberPosition}" , the selected one doesn't match with it`) : memberPositionError
+                return `${member.fname} ${member.lname}` === value && 
+                        ( Array.isArray(member.position)  ? member.position.includes(allValues.position[idx])
+                                                          : member.position === allValues.position[idx])
+            })?.length === 0  ? memberPositionError : undefined;
         }        
 
         return error;
@@ -95,7 +104,8 @@ export default function ComposeTeam() {
           error = "Position can't be repeated";
         }else if(allValues.users[idx] && allValues.position[idx] === value){
             error = members.filter((member) => {
-                return `${member.position}` === value && `${member.fname} ${member.lname}` === allValues.users[idx]
+                return (Array.isArray(member.position) ? member.position.includes(value) : member.position === value)
+                        && `${member.fname} ${member.lname}` === allValues.users[idx]
             })?.length === 0  ? `Selcted position does not match that of the selected member's` : undefined;
         }
         return error;
